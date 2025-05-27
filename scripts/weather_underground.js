@@ -8,7 +8,7 @@
 async function getWeather(location) {
     const apiKey = "6dfb9fed05d24b71bb9fed05d20b715d";
     // const apiUrl = `https://api.wunderground.com/api/${apiKey}/conditions/q/${location}.json`;
-    const apiUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${location}&format=json&units=h&apiKey=${apiKey}`;
+    const apiUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${location}&format=json&units=h&numericPrecision=decimal&apiKey=${apiKey}`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {

@@ -26,14 +26,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                         icon: 'bi-compass'
                     },
                     {
-                        title: 'Wind Speed',
-                        value: `${observation.uk_hybrid.windSpeed} km/h`,
+                        title: 'Wind Speed / Gust',
+                        value: `${observation.uk_hybrid.windSpeed} / ${observation.uk_hybrid.windGust} km/h`,
                         icon: 'bi-wind'
-                    },
-                    {
-                        title: 'Wind Gusts',
-                        value: `${observation.uk_hybrid.windGust} km/h`,
-                        icon: 'bi-tornado'
                     },
                     {
                         title: 'Temperature',
