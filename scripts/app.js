@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const location = 'ILUMBY7';
     const weatherDataContainer = document.getElementById('weather-data');
     const lastUpdatedElement = document.getElementById('last-updated');
+    const locationElement = document.getElementById('location');
 
     try {
         const weatherData = await getWeather(location);
@@ -11,8 +12,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             // Update last updated time
             const lastUpdated = new Date(observation.obsTimeUtc);
-            lastUpdatedElement.textContent = `Last updated: ${lastUpdated.toLocaleString()}`;
-
+            lastUpdatedElement.textContent = `Last updated: ${timeAgo(lastUpdated)}`;
+            locationElement.textContent = `Location: ${observation.lat}, ${observation.lon}`;
             // Clear loading indicator
             weatherDataContainer.innerHTML = '';
 
@@ -22,6 +23,26 @@ document.addEventListener('DOMContentLoaded', async function() {
                     title: 'Temperature',
                     value: `${observation.metric.temp}ºC`,
                     icon: 'bi-thermometer-half'
+                },
+                {
+                    title: 'Humidity',
+                    value: `${observation.humidity}%`,
+                    icon: 'bi-moisture'
+                },
+                {
+                    title: 'Heat Index',
+                    value: `${observation.metric.heatIndex}ºC`,
+                    icon: 'bi-thermometer-sun'
+                },
+                {
+                    title: 'Dew Point',
+                    value: `${observation.metric.dewpt}ºC`,
+                    icon: 'bi-droplet'
+                },
+                {
+                    title: 'Wind Chill',
+                    value: `${observation.metric.windChill}ºC`,
+                    icon: 'bi-thermometer-snow'
                 },
                 {
                     title: 'Wind Direction',
@@ -39,11 +60,37 @@ document.addEventListener('DOMContentLoaded', async function() {
                     icon: 'bi-tornado'
                 },
                 {
+                    title: 'Barometric Pressure',
+                    value: `${observation.metric.pressure} hPa`,
+                    icon: 'bi-speedometer'
+                },
+                {
+                    title: 'UV Index',
+                    value: `${observation.uv}`,
+                    icon: 'bi-sun'
+                },
+                {
+                    title: 'Solar Radiation',
+                    value: `${observation.solarRadiation} W/m²`,
+                    icon: 'bi-brightness-high'
+                },
+                {
                     title: 'Rainfall',
                     value: `${observation.metric.precipTotal} mm`,
                     icon: 'bi-cloud-rain'
+                },
+                {
+                    title: 'Precipitation Rate',
+                    value: `${observation.metric.precipRate} mm/hr`,
+                    icon: 'bi-cloud-drizzle'
+                },
+                {
+                    title: 'Elevation',
+                    value: `${observation.metric.elev} m`,
+                    icon: 'bi-mountain'
                 }
             ];
+
 
             // Render weather cards
             weatherItems.forEach(item => {
@@ -125,4 +172,35 @@ function degreesToDirection(degrees) {
 
     // Default fallback (should never reach this)
     return "N";
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+
+    let interval = Math.floor(seconds / 31536000); // years
+    if (interval >= 1) {
+        return interval === 1 ? '1 year ago' : `${interval} years ago`;
+    }
+
+    interval = Math.floor(seconds / 2592000); // months
+    if (interval >= 1) {
+        return interval === 1 ? '1 month ago' : `${interval} months ago`;
+    }
+
+    interval = Math.floor(seconds / 86400); // days
+    if (interval >= 1) {
+        return interval === 1 ? '1 day ago' : `${interval} days ago`;
+    }
+
+    interval = Math.floor(seconds / 3600); // hours
+    if (interval >= 1) {
+        return interval === 1 ? '1 hour ago' : `${interval} hours ago`;
+    }
+
+    interval = Math.floor(seconds / 60); // minutes
+    if (interval >= 1) {
+        return interval === 1 ? '1 minute ago' : `${interval} minutes ago`;
+    }
+
+    return seconds <= 5 ? 'just now' : `${Math.floor(seconds)} seconds ago`;
 }
