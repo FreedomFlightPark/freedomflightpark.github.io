@@ -1,3 +1,10 @@
+/**
+ * Fetches the current weather data for a given location using an external weather API.
+ *
+ * @param {string} location - The location identifier (e.g., station ID) for which to retrieve weather data.
+ * @return {Promise<Object|null>} A promise that resolves to the weather data object if the API call is successful,
+ * or null if an error occurs.
+ */
 async function getWeather(location) {
     const apiKey = "6dfb9fed05d24b71bb9fed05d20b715d";
     // const apiUrl = `https://api.wunderground.com/api/${apiKey}/conditions/q/${location}.json`;
@@ -23,7 +30,6 @@ function degreesToDirection(degrees) {
     // Ensure degrees is within 0-360 range
     degrees = ((degrees % 360) + 360) % 360;
 
-    // Define direction ranges (each direction spans 45 degrees)
     const directions = [
         { name: "N", min: 348.75, max: 360 },
         { name: "N", min: 0, max: 11.25 },
