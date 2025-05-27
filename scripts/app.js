@@ -26,12 +26,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 {
                     title: 'Wind Speed',
-                    value: `${observation.metric.windSpeed} kph`,
+                    value: `${observation.metric.windSpeed} km/h`,
                     icon: 'bi-wind'
                 },
                 {
                     title: 'Wind Gusts',
-                    value: `${observation.metric.windGust} kph`,
+                    value: `${observation.metric.windGust} km/h`,
                     icon: 'bi-tornado'
                 },
                 {
