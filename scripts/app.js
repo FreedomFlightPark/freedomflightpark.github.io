@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Render weather cards
             weatherItems.forEach(item => {
                 const cardCol = document.createElement('div');
-                cardCol.className = 'col-md-4 mb-4';
+                cardCol.className = 'col-md-3 mb-4';
 
                 cardCol.innerHTML = `
                             <div class="card weather-card shadow-sm">
