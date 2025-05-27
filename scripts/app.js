@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 {
                     title: 'Elevation',
                     value: `${observation.metric.elev} m`,
-                    icon: 'bi-mountain'
+                    icon: 'bi-geo-alt-fill'
                 }
             ];
 
