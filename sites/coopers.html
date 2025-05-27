@@ -68,30 +68,31 @@
                 const weatherItems = [
                     {
                         title: 'Temperature',
-                        value: `${observation.temp_f}°F / ${observation.temp_c}°C`,
+                        value: `${weatherData.observations[0].imperial.temp}°F`,
                         icon: 'bi-thermometer-half'
                     },
                     {
                         title: 'Wind Direction',
-                        value: observation.wind_dir,
+                        value: `${weatherData.observations[0].winddir}°`,
                         icon: 'bi-compass'
                     },
                     {
                         title: 'Wind Speed',
-                        value: `${observation.wind_mph} mph / ${observation.wind_kph} kph`,
+                        value: `${weatherData.observations[0].imperial.windSpeed} mph`,
                         icon: 'bi-wind'
                     },
                     {
                         title: 'Wind Gusts',
-                        value: `${observation.wind_gust_mph} mph / ${observation.wind_gust_kph} kph`,
+                        value: `${weatherData.observations[0].imperial.windGust} mph`,
                         icon: 'bi-tornado'
                     },
                     {
                         title: 'Rainfall',
-                        value: `${observation.precip_1hr_in} in / ${observation.precip_1hr_metric} mm`,
+                        value: `${weatherData.observations[0].imperial.precipTotal} in`,
                         icon: 'bi-cloud-rain'
                     }
                 ];
+
 
                 // Render weather cards
                 weatherItems.forEach(item => {
