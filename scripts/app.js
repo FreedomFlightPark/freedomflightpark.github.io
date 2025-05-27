@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Update last updated time
                 const lastUpdated = new Date(observation.obsTimeUtc);
                 lastUpdatedElement.textContent = `Last updated: ${timeAgo(lastUpdated)}`;
-                locationElement.textContent = `Location: ${observation.lat}, ${observation.lon}`;
+                locationElement.textContent = `Location: ${observation.lat.toFixed(3)}, ${observation.lon.toFixed(3)} at ${observation.uk_hybrid.elev} ft`;
                 // Clear loading indicator
                 weatherDataContainer.innerHTML = '';
 
@@ -79,11 +79,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                         title: 'Precipitation Rate',
                         value: `${observation.uk_hybrid.precipRate} mm/hr`,
                         icon: 'bi-cloud-drizzle'
-                    },
-                    {
-                        title: 'Elevation',
-                        value: `${observation.uk_hybrid.elev} ft`,
-                        icon: 'bi-geo-alt-fill'
                     }
                 ];
 
