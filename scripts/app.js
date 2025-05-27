@@ -26,22 +26,22 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 {
                     title: 'Wind Speed',
-                    value: `${observation.metric.windSpeed} km/h`,
+                    value: `${observation.uk_hybrid.windSpeed} km/h`,
                     icon: 'bi-wind'
                 },
                 {
                     title: 'Wind Gusts',
-                    value: `${observation.metric.windGust} km/h`,
+                    value: `${observation.uk_hybrid.windGust} km/h`,
                     icon: 'bi-tornado'
                 },
                 {
                     title: 'Temperature',
-                    value: `${observation.metric.temp}ºC`,
+                    value: `${observation.uk_hybrid.temp}ºC`,
                     icon: 'bi-thermometer-half'
                 },
                 {
                     title: 'Rainfall',
-                    value: `${observation.metric.precipTotal} mm`,
+                    value: `${observation.uk_hybrid.precipTotal} mm`,
                     icon: 'bi-cloud-rain'
                 },
                 {
@@ -51,22 +51,22 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 {
                     title: 'Heat Index',
-                    value: `${observation.metric.heatIndex}ºC`,
+                    value: `${observation.uk_hybrid.heatIndex}ºC`,
                     icon: 'bi-thermometer-sun'
                 },
                 {
                     title: 'Dew Point',
-                    value: `${observation.metric.dewpt}ºC`,
+                    value: `${observation.uk_hybrid.dewpt}ºC`,
                     icon: 'bi-droplet'
                 },
                 {
                     title: 'Wind Chill',
-                    value: `${observation.metric.windChill}ºC`,
+                    value: `${observation.uk_hybrid.windChill}ºC`,
                     icon: 'bi-thermometer-snow'
                 },
                 {
                     title: 'Barometric Pressure',
-                    value: `${observation.metric.pressure} hPa`,
+                    value: `${observation.uk_hybrid.pressure} hPa`,
                     icon: 'bi-speedometer'
                 },
                 {
@@ -81,12 +81,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 {
                     title: 'Precipitation Rate',
-                    value: `${observation.metric.precipRate} mm/hr`,
+                    value: `${observation.uk_hybrid.precipRate} mm/hr`,
                     icon: 'bi-cloud-drizzle'
                 },
                 {
                     title: 'Elevation',
-                    value: `${observation.metric.elev} m`,
+                    value: `${observation.uk_hybrid.elev} ft`,
                     icon: 'bi-geo-alt-fill'
                 }
             ];
