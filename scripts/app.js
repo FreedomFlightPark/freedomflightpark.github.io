@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 function degreesToDirection(degrees) {
     // Ensure degrees is within 0-360 range
     degrees = ((degrees % 360) + 360) % 360;
-
     const directions = [
         {name: "N", min: 348.75, max: 360},
         {name: "N", min: 0, max: 11.25},
@@ -160,7 +159,6 @@ function degreesToDirection(degrees) {
         {name: "NNW", min: 326.25, max: 348.75}
     ];
 
-
     // Find the matching direction
     for (const direction of directions) {
         if (direction.min <= degrees && degrees < direction.max) {
@@ -168,8 +166,7 @@ function degreesToDirection(degrees) {
         }
     }
 
-    // Default fallback (should never reach this)
-    return "N";
+    throw new Error(`Invalid degrees: ${degrees}`);
 }
 
 function timeAgo(date) {
