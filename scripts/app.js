@@ -20,9 +20,29 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Create weather cards
             const weatherItems = [
                 {
+                    title: 'Wind Direction',
+                    value: `${degreesToDirection(observation.winddir)} (${observation.winddir}°)`,
+                    icon: 'bi-compass'
+                },
+                {
+                    title: 'Wind Speed',
+                    value: `${observation.metric.windSpeed} kph`,
+                    icon: 'bi-wind'
+                },
+                {
+                    title: 'Wind Gusts',
+                    value: `${observation.metric.windGust} kph`,
+                    icon: 'bi-tornado'
+                },
+                {
                     title: 'Temperature',
                     value: `${observation.metric.temp}ºC`,
                     icon: 'bi-thermometer-half'
+                },
+                {
+                    title: 'Rainfall',
+                    value: `${observation.metric.precipTotal} mm`,
+                    icon: 'bi-cloud-rain'
                 },
                 {
                     title: 'Humidity',
@@ -45,21 +65,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                     icon: 'bi-thermometer-snow'
                 },
                 {
-                    title: 'Wind Direction',
-                    value: `${degreesToDirection(observation.winddir)} (${observation.winddir}°)`,
-                    icon: 'bi-compass'
-                },
-                {
-                    title: 'Wind Speed',
-                    value: `${observation.metric.windSpeed} kph`,
-                    icon: 'bi-wind'
-                },
-                {
-                    title: 'Wind Gusts',
-                    value: `${observation.metric.windGust} kph`,
-                    icon: 'bi-tornado'
-                },
-                {
                     title: 'Barometric Pressure',
                     value: `${observation.metric.pressure} hPa`,
                     icon: 'bi-speedometer'
@@ -73,11 +78,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                     title: 'Solar Radiation',
                     value: `${observation.solarRadiation} W/m²`,
                     icon: 'bi-brightness-high'
-                },
-                {
-                    title: 'Rainfall',
-                    value: `${observation.metric.precipTotal} mm`,
-                    icon: 'bi-cloud-rain'
                 },
                 {
                     title: 'Precipitation Rate',
