@@ -54,11 +54,11 @@
         try {
             const weatherData = await getWeather(location);
 
-            if (weatherData && weatherData.current_observation) {
-                const observation = weatherData.current_observation;
+            if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
+                const observation = weatherData.observations[0];
 
                 // Update last updated time
-                const lastUpdated = new Date(observation.observation_time_rfc822);
+                const lastUpdated = new Date(observation.obsTimeUtc);
                 lastUpdatedElement.textContent = `Last updated: ${lastUpdated.toLocaleString()}`;
 
                 // Clear loading indicator
@@ -68,31 +68,30 @@
                 const weatherItems = [
                     {
                         title: 'Temperature',
-                        value: `${weatherData.observations[0].imperial.temp}°F`,
+                        value: `${observation.imperial.temp}ºC`,
                         icon: 'bi-thermometer-half'
                     },
                     {
                         title: 'Wind Direction',
-                        value: `${weatherData.observations[0].winddir}°`,
+                        value: `${observation.winddir}°`,
                         icon: 'bi-compass'
                     },
                     {
                         title: 'Wind Speed',
-                        value: `${weatherData.observations[0].imperial.windSpeed} mph`,
+                        value: `${observation.imperial.windSpeed} kph`,
                         icon: 'bi-wind'
                     },
                     {
                         title: 'Wind Gusts',
-                        value: `${weatherData.observations[0].imperial.windGust} mph`,
+                        value: `${observation.imperial.windGust} kph`,
                         icon: 'bi-tornado'
                     },
                     {
                         title: 'Rainfall',
-                        value: `${weatherData.observations[0].imperial.precipTotal} in`,
+                        value: `${observation.imperial.precipTotal} mm`,
                         icon: 'bi-cloud-rain'
                     }
                 ];
-
 
                 // Render weather cards
                 weatherItems.forEach(item => {
