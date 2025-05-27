@@ -1,0 +1,10 @@
+.weather-card {
+    transition: transform 0.3s;
+}
+.weather-card:hover {
+    transform: translateY(-5px);
+}
+.weather-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
