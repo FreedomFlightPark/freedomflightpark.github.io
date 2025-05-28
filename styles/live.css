@@ -1,0 +1,101 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+#youtube-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.video-mask {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#youtube-player {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+}
+
+@media (max-aspect-ratio: 16/9) {
+    /* For screens that are taller than 16:9 ratio (most phones in portrait) */
+    #youtube-player {
+        width: 300%;
+        height: 100%;
+        top: 0;
+        left: -100%;
+    }
+}
+
+#weather-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.90);
+    color: white;
+    padding: 10px;
+    z-index: 2;
+    display: flex;
+    justify-content: space-around;
+}
+
+.weather-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.weather-icon {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.weather-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.weather-title {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+@media (max-width: 767px) {
+    #weather-overlay {
+        flex-wrap: wrap;
+    }
+
+    .weather-item {
+        width: 50%;
+        padding: 5px 10px;
+        margin-bottom: 5px;
+    }
+
+    .weather-icon {
+        font-size: 1.5rem;
+    }
+
+    .weather-value {
+        font-size: 1rem;
+    }
+
+    .weather-title {
+        font-size: 0.8rem;
+    }
+}
