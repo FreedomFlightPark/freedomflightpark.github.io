@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooper's Launch Live Stream</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../styles/app.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #youtube-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .video-mask {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #youtube-player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%; /* Extra wide to ensure it covers the container */
+            height: 150%; /* Extra tall to ensure it covers the container */
+            transform: translate(-50%, -50%) scale(1.01); /* Center and slightly scale to avoid borders */
+            pointer-events: none;
+        }
+        
+        #weather-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 10px;
+            z-index: 2;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .weather-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .weather-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .weather-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .weather-title {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+<div id="youtube-container">
+    <div class="video-mask">
+        <iframe style="border: none;"
+                id="youtube-player"
+                src="https://www.youtube.com/embed/RDVfXkNjPUM?autoplay=1&mute=1&controls=0&rel=0&showinfo=0&loop=1&playlist=RDVfXkNjPUM&modestbranding=1&iv_load_policy=3&disablekb=1"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<div id="weather-overlay">
+    <div class="weather-item" id="wind-direction">
+        <i class="bi bi-compass weather-icon"></i>
+        <div class="weather-value">Loading...</div>
+        <div class="weather-title">Wind Direction</div>
+    </div>
+
+    <div class="weather-item" id="wind-speed">
+        <i class="bi bi-wind weather-icon"></i>
+        <div class="weather-value">Loading...</div>
+        <div class="weather-title">Wind Speed / Gust</div>
+    </div>
+
+    <div class="weather-item" id="rainfall">
+        <i class="bi bi-cloud-rain weather-icon"></i>
+        <div class="weather-value">Loading...</div>
+        <div class="weather-title">Rainfall</div>
+    </div>
+
+    <div class="weather-item" id="rain-rate">
+        <i class="bi bi-cloud-drizzle weather-icon"></i>
+        <div class="weather-value">Loading...</div>
+        <div class="weather-title">Precipitation Rate</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../scripts/time.js"></script>
+<script src="../../scripts/weather.js"></script>
+<script src="../../scripts/app.js"></script>
+<script>
+    var app = app || {};
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        // Initial data load
+        await loadAndDisplayWeatherOverlay();
+
+        // Set up automatic refresh every 5 minutes
+        setInterval(loadAndDisplayWeatherOverlay, 5 * 60 * 1000);
+    });
+
+    async function loadAndDisplayWeatherOverlay() {
+        try {
+            const location = 'ILUMBY7';
+            const weatherData = await app.weather.weatherUnderground.getWeather(location);
+
+            if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
+                const observation = weatherData.observations[0];
+
+                // Update wind direction
+                const windDirectionElement = document.querySelector('#wind-direction .weather-value');
+                windDirectionElement.textContent = `${app.weather.degreesToDirection(observation.winddir)} (${observation.winddir}°)`;
+
+                // Update wind speed/gust
+                const windSpeedElement = document.querySelector('#wind-speed .weather-value');
+                windSpeedElement.textContent = `${observation.uk_hybrid.windSpeed} / ${observation.uk_hybrid.windGust} km/h`;
+
+                // Update rainfall
+                const rainfallElement = document.querySelector('#rainfall .weather-value');
+                rainfallElement.textContent = `${observation.uk_hybrid.precipTotal} mm`;
+
+                // Update precipitation rate
+                const rainRateElement = document.querySelector('#rain-rate .weather-value');
+                rainRateElement.textContent = `${observation.uk_hybrid.precipRate} mm/hr`;
+            }
+        } catch (error) {
+            console.error("Error updating weather overlay:", error);
+        }
+    }
+</script>
+</body>
+</html>
