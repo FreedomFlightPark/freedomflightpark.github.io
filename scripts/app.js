@@ -125,9 +125,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Initial data load
     await updateWeatherData();
-
-// Set up interval to update data every 15 seconds (15000 milliseconds)
-    setInterval(updateWeatherData, 15000);
 });
 
 
