@@ -107,9 +107,8 @@ app.weather = {
                     cardCol.className = 'col-md-3 mb-4';
 
                     cardCol.innerHTML = `
-                        <div class="card weather-card shadow-sm">
+                        <div class="card weather-card shadow-sm h-100">
                             <div class="card-body text-center">
-                           
                                 <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
                                 <h5 class="card-title card-title">${item.title}</h5>
                                 <h2 class="card-text text-regular">${item.value}</h2>
