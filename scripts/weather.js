@@ -5,15 +5,19 @@ app.weather = {
      * @returns {Promise<void>}
      */
     async loadWeatherData() {
-        const location = 'ILUMBY7';
+        const primaryLocation = 'ILUMBY7';
+        const lapsLocation = 'ILUMBY2';
         const weatherDataContainer = document.getElementById('weather-data');
         const lastUpdatedElement = document.getElementById('last-updated');
         const locationElement = document.getElementById('location');
         try {
-            const weatherData = await app.weather.weatherUnderground.getWeather(location);
+            const launchWeather = await app.weather.weatherUnderground.getWeather(primaryLocation);
+            const lzWeather = await app.weather.weatherUnderground.getWeather(lapsLocation);
+            const lapseRateInfo = this.calculateLapseRate(lzWeather, launchWeather);
 
-            if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
-                const observation = weatherData.observations[0];
+
+            if (launchWeather && launchWeather.observations && launchWeather.observations.length > 0) {
+                const observation = launchWeather.observations[0];
 
                 // Update last updated time
                 const lastUpdated = new Date(observation.obsTimeUtc);
@@ -28,7 +32,7 @@ app.weather = {
                         title: 'Wind Direction',
                         value: `${this.degreesToDirection(observation.winddir)}`,
                         icon: 'navigation',
-                        style: `transform: rotate(${observation.winddir+180}deg);`
+                        style: `transform: rotate(${observation.winddir + 180}deg);`
                     },
                     {
                         title: 'Wind Speed',
@@ -44,6 +48,11 @@ app.weather = {
                         title: 'Temperature',
                         value: `${observation.uk_hybrid.temp}ºC`,
                         icon: 'device_thermostat'
+                    },
+                    {
+                        title: 'Lapse Rate',
+                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.elevDiff}m)` : 'N/A',
+                        icon: 'elevation'
                     },
                     {
                         title: 'Rainfall',
@@ -116,7 +125,7 @@ app.weather = {
                 weatherDataContainer.innerHTML = `
                     <div class="col-12 text-center">
                         <div class="alert alert-warning" role="alert">
-                            No weather data available for location: ${location}
+                            No weather data available for location: ${primaryLocation}
                         </div>
                     </div>
                 `;
@@ -171,6 +180,39 @@ app.weather = {
 
         throw new Error(`Invalid degrees: ${degrees}`);
     },
+
+    /**
+     * Calculates the temperature lapse rate between two locations
+     * @param {Object} primaryData - Weather data from primary location
+     * @param {Object} lapsData - Weather data from laps location
+     * @returns {Object} Object containing lapse rate (°C/km) and elevation difference (m)
+     */
+    calculateLapseRate(primaryData, lapsData) {
+        // Check if we have valid data
+        if (!primaryData?.observations?.[0] || !lapsData?.observations?.[0]) {
+            return {lapseRate: null, elevDiff: null};
+        }
+        const feetToKilometers = feet => feet * 0.3048;
+
+        const primaryObs = primaryData.observations[0];
+        const lapsObs = lapsData.observations[0];
+
+        // Calculate elevation difference in kilometers
+        const elevDiffMeters = feetToKilometers(lapsObs.uk_hybrid.elev) - feetToKilometers(primaryObs.uk_hybrid.elev);
+        const elevDiffKm = elevDiffMeters / 1000;
+
+        // Calculate temperature difference
+        const tempDiff = primaryObs.uk_hybrid.temp - lapsObs.uk_hybrid.temp;
+
+        // Calculate lapse rate in °C/km (avoid division by zero)
+        const lapseRate = Math.abs(elevDiffMeters / 1000) < 0.001 ? 0 : tempDiff / elevDiffKm;
+
+        return {
+            lapseRate: lapseRate.toFixed(2),
+            elevDiff: elevDiffMeters.toFixed(1)
+        };
+    },
+
 
     weatherUnderground: {
         /**
