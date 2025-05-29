@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cooper's Launch Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/app.css">
     <link rel="stylesheet" href="../../styles/live.css">
 </head>
@@ -21,27 +22,28 @@
     </div>
 </div>
 
+
 <div id="weather-overlay">
     <div class="weather-item" id="wind-direction">
-        <i class="bi bi-compass weather-icon"></i>
+        <i class="material-icons weather-icon">navigation</i>
         <div class="weather-value">Loading...</div>
         <div class="weather-title">Wind Direction</div>
     </div>
 
     <div class="weather-item" id="wind-speed">
-        <i class="bi bi-wind weather-icon"></i>
+        <i class="material-icons weather-icon">air</i>
         <div class="weather-value">Loading...</div>
         <div class="weather-title">Wind Speed / Gust</div>
     </div>
 
     <div class="weather-item" id="rainfall">
-        <i class="bi bi-cloud-rain weather-icon"></i>
+        <i class="material-icons weather-icon">water_drop</i>
         <div class="weather-value">Loading...</div>
         <div class="weather-title">Rainfall</div>
     </div>
 
     <div class="weather-item" id="rain-rate">
-        <i class="bi bi-cloud-drizzle weather-icon"></i>
+        <i class="material-icons weather-icon">grain</i>
         <div class="weather-value">Loading...</div>
         <div class="weather-title">Precipitation Rate</div>
     </div>
@@ -73,6 +75,9 @@
                 // Update wind direction
                 const windDirectionElement = document.querySelector('#wind-direction .weather-value');
                 windDirectionElement.textContent = `${app.weather.degreesToDirection(observation.winddir)} (${observation.winddir}°)`;
+
+                const windIconElement = document.querySelector('#wind-direction .weather-icon');
+                windIconElement.style = `transform: rotate(${observation.winddir+180}deg);`;
 
                 // Update wind speed/gust
                 const windSpeedElement = document.querySelector('#wind-speed .weather-value');

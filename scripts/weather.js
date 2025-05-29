@@ -27,62 +27,63 @@ app.weather = {
                     {
                         title: 'Wind Direction',
                         value: `${this.degreesToDirection(observation.winddir)} (${observation.winddir}°)`,
-                        icon: 'bi-compass'
+                        icon: 'navigation',
+                        style: `transform: rotate(${observation.winddir+180}deg);`
                     },
                     {
                         title: 'Wind Speed / Gust',
                         value: `${observation.uk_hybrid.windSpeed} / ${observation.uk_hybrid.windGust} km/h`,
-                        icon: 'bi-wind'
+                        icon: 'air'
                     },
                     {
                         title: 'Temperature',
                         value: `${observation.uk_hybrid.temp}ºC`,
-                        icon: 'bi-thermometer-half'
+                        icon: 'device_thermostat'
                     },
                     {
                         title: 'Rainfall',
                         value: `${observation.uk_hybrid.precipTotal} mm`,
-                        icon: 'bi-cloud-rain'
+                        icon: 'water_drop'
                     },
                     {
                         title: 'Humidity',
                         value: `${observation.humidity}%`,
-                        icon: 'bi-moisture'
+                        icon: 'water_percent'
                     },
                     {
                         title: 'Heat Index',
                         value: `${observation.uk_hybrid.heatIndex}ºC`,
-                        icon: 'bi-thermometer-sun'
+                        icon: 'wb_sunny'
                     },
                     {
                         title: 'Dew Point',
                         value: `${observation.uk_hybrid.dewpt}ºC`,
-                        icon: 'bi-droplet'
+                        icon: 'opacity'
                     },
                     {
                         title: 'Wind Chill',
                         value: `${observation.uk_hybrid.windChill}ºC`,
-                        icon: 'bi-thermometer-snow'
+                        icon: 'ac_unit'
                     },
                     {
                         title: 'Barometric Pressure',
                         value: `${observation.uk_hybrid.pressure} hPa`,
-                        icon: 'bi-speedometer'
+                        icon: 'speed'
                     },
                     {
                         title: 'UV Index',
                         value: `${observation.uv}`,
-                        icon: 'bi-sun'
+                        icon: 'light_mode'
                     },
                     {
                         title: 'Solar Radiation',
                         value: `${observation.solarRadiation} W/m²`,
-                        icon: 'bi-brightness-high'
+                        icon: 'brightness_7'
                     },
                     {
                         title: 'Precipitation Rate',
                         value: `${observation.uk_hybrid.precipRate} mm/hr`,
-                        icon: 'bi-cloud-drizzle'
+                        icon: 'grain'
                     }
                 ];
 
@@ -94,12 +95,13 @@ app.weather = {
                     cardCol.innerHTML = `
                         <div class="card weather-card shadow-sm">
                             <div class="card-body text-center">
-                                <i class="bi ${item.icon} weather-icon"></i>
+                                <i class="material-icons weather-icon" style="${item.style}">${item.icon}</i>
                                 <h5 class="card-title">${item.title}</h5>
                                 <h2 class="card-text">${item.value}</h2>
                             </div>
                         </div>
                     `;
+
 
                     weatherDataContainer.appendChild(cardCol);
                 });
