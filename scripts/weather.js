@@ -50,7 +50,7 @@ app.weather = {
                         icon: 'device_thermostat'
                     },
                     {
-                        title: 'Lapse Rate',
+                        title: `Lapse Rate: ${lapseRateInfo.summary.name}`,
                         value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.elevDiff}m)` : 'N/A',
                         icon: 'elevation'
                     },
@@ -206,10 +206,30 @@ app.weather = {
 
         // Calculate lapse rate in °C/km (avoid division by zero)
         const lapseRate = Math.abs(elevDiffMeters / 1000) < 0.001 ? 0 : tempDiff / elevDiffKm;
+// Determine the stability summary based on lapse rate
+        let summaries = [
+            {name: 'Very Stable', threshold: 5, details: 'Smooth air, but poor thermals'},
+            {name: 'Slightly Unstable', threshold: 8, details: 'Gentle thermals, ideal for newer pilots'},
+            {name: 'Unstable', threshold: 9.8, details: 'Stronger thermals, more altitude gain'},
+            {name: 'Very Unstable', threshold: 10, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
+        ];
+        const absLapseRate = Math.abs(lapseRate); // Use absolute value for comparison
+
+        let summary;
+        if (absLapseRate < 5) {
+            summary = summaries[0];
+        } else if (absLapseRate >= 5 && absLapseRate < 8) {
+            summary = summaries[1];
+        } else if (absLapseRate >= 8 && absLapseRate <= 9.8) {
+            summary = summaries[2];
+        } else {
+            summary = summaries[3];
+        }
 
         return {
             lapseRate: lapseRate.toFixed(2),
-            elevDiff: elevDiffMeters.toFixed(1)
+            elevDiff: elevDiffMeters.toFixed(1),
+            summary: summary
         };
     },
 
