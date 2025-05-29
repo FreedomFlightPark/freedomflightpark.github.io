@@ -35,13 +35,8 @@ app.weather = {
                         style: `transform: rotate(${observation.winddir + 180}deg);`
                     },
                     {
-                        title: 'Wind Speed',
-                        value: `${observation.uk_hybrid.windSpeed} km/h`,
-                        icon: 'air'
-                    },
-                    {
-                        title: 'Wind Gust',
-                        value: `${observation.uk_hybrid.windGust} km/h`,
+                        title: 'Wind Speed (Gust)',
+                        value: `${observation.uk_hybrid.windSpeed} km/h (${observation.uk_hybrid.windGust} km/h)`,
                         icon: 'air'
                     },
                     {
