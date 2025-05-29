@@ -26,13 +26,18 @@ app.weather = {
                 const weatherItems = [
                     {
                         title: 'Wind Direction',
-                        value: `${this.degreesToDirection(observation.winddir)} (${observation.winddir}°)`,
+                        value: `${this.degreesToDirection(observation.winddir)}`,
                         icon: 'navigation',
                         style: `transform: rotate(${observation.winddir+180}deg);`
                     },
                     {
-                        title: 'Wind Speed / Gust',
-                        value: `${observation.uk_hybrid.windSpeed} / ${observation.uk_hybrid.windGust} km/h`,
+                        title: 'Wind Speed',
+                        value: `${observation.uk_hybrid.windSpeed} km/h`,
+                        icon: 'air'
+                    },
+                    {
+                        title: 'Wind Gust',
+                        value: `${observation.uk_hybrid.windGust} km/h`,
                         icon: 'air'
                     },
                     {
@@ -48,7 +53,7 @@ app.weather = {
                     {
                         title: 'Humidity',
                         value: `${observation.humidity}%`,
-                        icon: 'water_percent'
+                        icon: 'humidity_percentage'
                     },
                     {
                         title: 'Heat Index',
@@ -95,7 +100,8 @@ app.weather = {
                     cardCol.innerHTML = `
                         <div class="card weather-card shadow-sm">
                             <div class="card-body text-center">
-                                <i class="material-icons weather-icon" style="${item.style}">${item.icon}</i>
+                           
+                                <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
                                 <h5 class="card-title">${item.title}</h5>
                                 <h2 class="card-text">${item.value}</h2>
                             </div>
