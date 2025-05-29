@@ -102,8 +102,8 @@ app.weather = {
                             <div class="card-body text-center">
                            
                                 <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
-                                <h5 class="card-title">${item.title}</h5>
-                                <h2 class="card-text">${item.value}</h2>
+                                <h5 class="card-title card-title">${item.title}</h5>
+                                <h2 class="card-text text-regular">${item.value}</h2>
                             </div>
                         </div>
                     `;
