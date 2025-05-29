@@ -45,14 +45,14 @@ app.weather = {
                         icon: 'air'
                     },
                     {
-                        title: 'Temperature',
-                        value: `${observation.uk_hybrid.temp}ºC`,
-                        icon: 'device_thermostat'
-                    },
-                    {
                         title: `Lapse Rate: ${lapseRateInfo.summary.name}`,
                         value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.elevDiff}m)` : 'N/A',
                         icon: 'elevation'
+                    },
+                    {
+                        title: 'Temperature',
+                        value: `${observation.uk_hybrid.temp}ºC`,
+                        icon: 'device_thermostat'
                     },
                     {
                         title: 'Rainfall',
