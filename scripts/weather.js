@@ -202,10 +202,10 @@ app.weather = {
         const lapseRate = Math.abs(elevDiffMeters / 1000) < 0.001 ? 0 : tempDiff / elevDiffKm;
 // Determine the stability summary based on lapse rate
         let summaries = [
-            {name: 'Very Stable', threshold: 5, details: 'Smooth air, but poor thermals'},
-            {name: 'Slightly Unstable', threshold: 8, details: 'Gentle thermals, ideal for newer pilots'},
-            {name: 'Unstable', threshold: 9.8, details: 'Stronger thermals, more altitude gain'},
-            {name: 'Very Unstable', threshold: 10, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
+            {name: 'very stable', threshold: 5, details: 'Smooth air, but poor thermals'},
+            {name: 'slightly unstable', threshold: 8, details: 'Gentle thermals, ideal for newer pilots'},
+            {name: 'unstable', threshold: 9.8, details: 'Stronger thermals, more altitude gain'},
+            {name: 'very unstable', threshold: 10, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
         ];
         const absLapseRate = Math.abs(lapseRate); // Use absolute value for comparison
 
