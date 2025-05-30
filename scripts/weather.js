@@ -40,8 +40,8 @@ app.weather = {
                         icon: 'air'
                     },
                     {
-                        title: `Lapse Rate: ${lapseRateInfo.summary.name}`,
-                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.elevDiff}m)` : 'N/A',
+                        title: `Lapse Rate: (${lapseRateInfo.elevDiff}m)`,
+                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.summary.name})` : 'N/A',
                         icon: 'elevation'
                     },
                     {
