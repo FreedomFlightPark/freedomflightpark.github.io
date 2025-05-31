@@ -40,8 +40,8 @@ app.weather = {
                         icon: 'air'
                     },
                     {
-                        title: `Lapse Rate: (${lapseRateInfo.elevDiff}m)`,
-                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/km (${lapseRateInfo.summary.name})` : 'N/A',
+                        title: `Lapse Rate: (${lapseRateInfo.elevDiff}ft)`,
+                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/1000 ft (${lapseRateInfo.summary.name})` : 'N/A',
                         icon: 'elevation'
                     },
                     {
@@ -99,7 +99,7 @@ app.weather = {
                 // Render weather cards
                 weatherItems.forEach(item => {
                     const cardCol = document.createElement('div');
-                    cardCol.className = 'col-md-3 mb-4';
+                    cardCol.className = 'col-s-6 col-md-3 mb-4';
 
                     cardCol.innerHTML = `
                         <div class="card weather-card shadow-sm h-100">
@@ -186,35 +186,37 @@ app.weather = {
         if (!primaryData?.observations?.[0] || !lapsData?.observations?.[0]) {
             return {lapseRate: null, elevDiff: null};
         }
-        const feetToKilometers = feet => feet * 0.3048;
 
         const primaryObs = primaryData.observations[0];
         const lapsObs = lapsData.observations[0];
 
-        // Calculate elevation difference in kilometers
-        const elevDiffMeters = feetToKilometers(lapsObs.uk_hybrid.elev) - feetToKilometers(primaryObs.uk_hybrid.elev);
-        const elevDiffKm = elevDiffMeters / 1000;
+        // Calculate elevation difference in feet
+        const elevDiffFeet = lapsObs.uk_hybrid.elev - primaryObs.uk_hybrid.elev;
+        const elevDiffThousandFeet = elevDiffFeet / 1000;
 
         // Calculate temperature difference
         const tempDiff = primaryObs.uk_hybrid.temp - lapsObs.uk_hybrid.temp;
 
-        // Calculate lapse rate in °C/km (avoid division by zero)
-        const lapseRate = Math.abs(elevDiffMeters / 1000) < 0.001 ? 0 : tempDiff / elevDiffKm;
-// Determine the stability summary based on lapse rate
+        // Calculate lapse rate in °C/1000ft (avoid division by zero)
+        const lapseRate = Math.abs(elevDiffFeet / 1000) < 0.001 ? 0 : tempDiff / elevDiffThousandFeet;
+
+        // Determine the stability summary based on lapse rate
+        // Note: Thresholds adjusted for °C/1000ft (converted from °C/km)
+        // 1 °C/km is approximately 0.3 °C/1000ft
         let summaries = [
-            {name: 'very stable', threshold: 5, details: 'Smooth air, but poor thermals'},
-            {name: 'slightly unstable', threshold: 8, details: 'Gentle thermals, ideal for newer pilots'},
-            {name: 'unstable', threshold: 9.8, details: 'Stronger thermals, more altitude gain'},
-            {name: 'very unstable', threshold: 10, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
+            {name: 'very stable', threshold: 1.5, details: 'Smooth air, but poor thermals'},
+            {name: 'slightly unstable', threshold: 2.4, details: 'Gentle thermals, ideal for newer pilots'},
+            {name: 'unstable', threshold: 3.0, details: 'Stronger thermals, more altitude gain'},
+            {name: 'very unstable', threshold: 3.1, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
         ];
         const absLapseRate = Math.abs(lapseRate); // Use absolute value for comparison
 
         let summary;
-        if (absLapseRate < 5) {
+        if (absLapseRate < 1.5) {
             summary = summaries[0];
-        } else if (absLapseRate >= 5 && absLapseRate < 8) {
+        } else if (absLapseRate >= 1.5 && absLapseRate < 2.4) {
             summary = summaries[1];
-        } else if (absLapseRate >= 8 && absLapseRate <= 9.8) {
+        } else if (absLapseRate >= 2.4 && absLapseRate <= 3.0) {
             summary = summaries[2];
         } else {
             summary = summaries[3];
@@ -222,10 +224,11 @@ app.weather = {
 
         return {
             lapseRate: lapseRate.toFixed(2),
-            elevDiff: elevDiffMeters.toFixed(1),
+            elevDiff: elevDiffFeet.toFixed(1),
             summary: summary
         };
     },
+
 
 
     weatherUnderground: {
