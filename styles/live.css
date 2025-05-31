@@ -34,10 +34,10 @@ body, html {
 @media (max-aspect-ratio: 16/9) {
     /* For screens that are taller than 16:9 ratio (most phones in portrait) */
     #youtube-player {
+        top: -0%;
+        left: -0%;
         width: 100%;
         height: 100%;
-        top: 0;
-        left: -100%;
     }
 }
 
