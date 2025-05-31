@@ -99,7 +99,7 @@ app.weather = {
                 // Render weather cards
                 weatherItems.forEach(item => {
                     const cardCol = document.createElement('div');
-                    cardCol.className = 'col-s-6 col-md-3 mb-4';
+                    cardCol.className = 'col-6 col-md-3 mb-4';
 
                     cardCol.innerHTML = `
                         <div class="card weather-card shadow-sm h-100">
