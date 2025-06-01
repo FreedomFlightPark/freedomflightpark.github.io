@@ -119,7 +119,8 @@ app.weather = {
                 weatherDataContainer.innerHTML = `
                     <div class="col-12 text-center">
                         <div class="alert alert-warning" role="alert">
-                            No weather data available for location: ${primaryLocation}
+                            No weather data available, please try again later.</br>
+                            In the mean time, try <a href="https://wunderground.com/dashboard/pws/${primaryLocation}" target="_blank">this link</a>
                         </div>
                     </div>
                 `;
