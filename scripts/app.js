@@ -4,6 +4,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     await app.weather.loadWeatherData();
 
     // Set up automatic refresh every 5 minutes
-    setInterval(loadAndDisplayWeatherOverlay, 10 * 60 * 1000);
+    setInterval(loadAndDisplayWeatherOverlay, 15 * 60 * 1000);
 });
 
