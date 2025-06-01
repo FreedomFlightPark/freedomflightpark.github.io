@@ -44,10 +44,11 @@ app.weather = {
                     },
                     {
                         title: `Lapse Rate: (${lapseRateInfo.elevDiff}ft)`,
-                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/1000 ft (${lapseRateInfo.summary.name})` : 'N/A',
+                        value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/1000 ft` : 'N/A',
                         icon: 'elevation',
                         background: lapseRateInfo.summary.color,
-                        backgroundType: 'color'
+                        backgroundType: 'color',
+                        summary: `${lapseRateInfo.summary.name}`
                     },
                     {
                         title: 'Temperature',
@@ -112,19 +113,26 @@ app.weather = {
                                 ${item.title}
                             </div>
                         
-                            <div class="card-body text-center" ${item.background ?
+                            <div class="card-body text-center d-flex flex-column justify-content-between"
+                                ${item.background ?
                                                 item.backgroundType === 'image'
                                                     ? `style="background-image: url('${item.background}'); background-size: cover; background-position: center;"`
                                                     : item.backgroundType === 'color'
                                                         ? `style="background-color: ${item.background};"`
                                                         : ''
                                                 : ''}>
-                                <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
-                                <h2 class="card-text text-regular">${item.value}</h2>
+                        
+                                <div class="flex-grow-1 d-flex justify-content-center align-items-start">
+                                    <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
+                                </div>
+                        
+                                <div class="mt-auto">
+                                    <h2 class="card-text text-regular">${item.value}</h2>
+                                    ${item.summary ? `<div class="card-subtext text-muted small">${item.summary}</div>` : ''}
+                                </div>
                             </div>
                         </div>
                     `;
-
 
                     weatherDataContainer.appendChild(cardCol);
                 });
