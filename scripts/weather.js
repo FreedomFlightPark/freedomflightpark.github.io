@@ -13,7 +13,7 @@ app.weather = {
         try {
             const launchWeather = await app.weather.weatherUnderground.getWeather(primaryLocation);
             const lzWeather = await app.weather.weatherUnderground.getWeather(lapsLocation);
-            const lapseRateInfo = this.calculateLapseRate(lzWeather, launchWeather);
+            const lapseRateInfo = this.calculateLapseRate(launchWeather, lzWeather);
 
 
             if (launchWeather && launchWeather.observations && launchWeather.observations.length > 0) {
@@ -23,6 +23,7 @@ app.weather = {
                 const lastUpdated = new Date(observation.obsTimeUtc);
                 lastUpdatedElement.textContent = `Last updated: ${app.time.timeAgo(lastUpdated)}`;
                 locationElement.textContent = `Location: ${observation.lat.toFixed(3)}, ${observation.lon.toFixed(3)} at ${observation.uk_hybrid.elev} ft`;
+
                 // Clear loading indicator
                 weatherDataContainer.innerHTML = '';
 
@@ -32,7 +33,9 @@ app.weather = {
                         title: 'Wind Direction',
                         value: `${this.degreesToDirection(observation.winddir)}`,
                         icon: 'navigation',
-                        style: `transform: rotate(${observation.winddir + 180}deg);`
+                        style: `transform: rotate(${observation.winddir + 180}deg);`,
+                        background: `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${observation.lon},${observation.lat},14/600x400?access_token=pk.eyJ1IjoiY2hhc2VmbG9yZWxsIiwiYSI6ImNtYmN4bXJnNzEza2cyam42MWNwNmJ5cmIifQ.40BZbxanvherUlpc4RdoFw`,
+                        backgroundType: 'image'
                     },
                     {
                         title: 'Wind Speed (Gust)',
@@ -42,7 +45,9 @@ app.weather = {
                     {
                         title: `Lapse Rate: (${lapseRateInfo.elevDiff}ft)`,
                         value: lapseRateInfo.lapseRate ? `${lapseRateInfo.lapseRate} °C/1000 ft (${lapseRateInfo.summary.name})` : 'N/A',
-                        icon: 'elevation'
+                        icon: 'elevation',
+                        background: lapseRateInfo.summary.color,
+                        backgroundType: 'color'
                     },
                     {
                         title: 'Temperature',
@@ -76,13 +81,13 @@ app.weather = {
                     },
                     {
                         title: 'Barometric Pressure',
-                        value: `${observation.uk_hybrid.pressure} hPa`,
+                        value: `${(observation.uk_hybrid.pressure / 10).toFixed(1)} kPa`,
                         icon: 'speed'
                     },
                     {
                         title: 'UV Index',
                         value: `${observation.uv}`,
-                        icon: 'light_mode'
+                        icon: 'light_mode',
                     },
                     {
                         title: 'Solar Radiation',
@@ -103,9 +108,18 @@ app.weather = {
 
                     cardCol.innerHTML = `
                         <div class="card weather-card shadow-sm h-100">
-                            <div class="card-body text-center">
+                            <div class="card-header text-center fw-bold">
+                                ${item.title}
+                            </div>
+                        
+                            <div class="card-body text-center" ${item.background ?
+                                                item.backgroundType === 'image'
+                                                    ? `style="background-image: url('${item.background}'); background-size: cover; background-position: center;"`
+                                                    : item.backgroundType === 'color'
+                                                        ? `style="background-color: ${item.background};"`
+                                                        : ''
+                                                : ''}>
                                 <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
-                                <h5 class="card-title card-title">${item.title}</h5>
                                 <h2 class="card-text text-regular">${item.value}</h2>
                             </div>
                         </div>
@@ -182,45 +196,17 @@ app.weather = {
      * @returns {Object} Object containing lapse rate (°C/km) and elevation difference (m)
      */
     calculateLapseRate(primaryData, lapsData) {
-        // Check if we have valid data
         if (!primaryData?.observations?.[0] || !lapsData?.observations?.[0]) {
-            return {lapseRate: null, elevDiff: null};
+            return {lapseRate: null, elevDiff: null, summary: null};
         }
 
         const primaryObs = primaryData.observations[0];
         const lapsObs = lapsData.observations[0];
-
-        // Calculate elevation difference in feet
         const elevDiffFeet = lapsObs.uk_hybrid.elev - primaryObs.uk_hybrid.elev;
-        const elevDiffThousandFeet = elevDiffFeet / 1000;
-
-        // Calculate temperature difference
+        const elevDiffThousandFeet = Math.abs(elevDiffFeet / 1000);
         const tempDiff = primaryObs.uk_hybrid.temp - lapsObs.uk_hybrid.temp;
-
-        // Calculate lapse rate in °C/1000ft (avoid division by zero)
-        const lapseRate = Math.abs(elevDiffFeet / 1000) < 0.001 ? 0 : tempDiff / elevDiffThousandFeet;
-
-        // Determine the stability summary based on lapse rate
-        // Note: Thresholds adjusted for °C/1000ft (converted from °C/km)
-        // 1 °C/km is approximately 0.3 °C/1000ft
-        let summaries = [
-            {name: 'very stable', threshold: 1.5, details: 'Smooth air, but poor thermals'},
-            {name: 'slightly unstable', threshold: 2.4, details: 'Gentle thermals, ideal for newer pilots'},
-            {name: 'unstable', threshold: 3.0, details: 'Stronger thermals, more altitude gain'},
-            {name: 'very unstable', threshold: 3.1, details: 'Great lift, but can be turbulent or even dangerous if overdeveloped'}
-        ];
-        const absLapseRate = Math.abs(lapseRate); // Use absolute value for comparison
-
-        let summary;
-        if (absLapseRate < 1.5) {
-            summary = summaries[0];
-        } else if (absLapseRate >= 1.5 && absLapseRate < 2.4) {
-            summary = summaries[1];
-        } else if (absLapseRate >= 2.4 && absLapseRate <= 3.0) {
-            summary = summaries[2];
-        } else {
-            summary = summaries[3];
-        }
+        const lapseRate = elevDiffThousandFeet < 0.001 ? 0 : tempDiff / elevDiffThousandFeet;
+        const summary = this.lapseSummaries.find(s => lapseRate <= s.max);
 
         return {
             lapseRate: lapseRate.toFixed(2),
@@ -229,7 +215,17 @@ app.weather = {
         };
     },
 
-
+    lapseSummaries: [
+        {name: 'Unstable', max: -3.0, color: '#ff0000', details: 'Strong thermals, turbulent conditions possible'},
+        {name: 'Conditional Instability', max: -2.5, color: '#ff8000', details: 'Thermals likely, some instability'},
+        {name: 'Conditional Instability', max: -2.0, color: '#ffb6ff', details: 'Weaker thermals developing'},
+        {name: 'Conditional Instability', max: -1.5, color: '#dcb7ff', details: 'Marginal thermal lift possible'},
+        {name: 'Stable', max: -1.2, color: '#fddbb0', details: 'Mostly smooth air, limited thermal activity'},
+        {name: 'Stable', max: -0.5, color: '#8080ff', details: 'Very little thermal activity, smooth flying'},
+        {name: 'Stable', max: 0.0, color: '#c0cfff', details: 'Cool and calm, no climb potential'},
+        {name: 'Inverted', max: 0.5, color: '#d3d3d3', details: 'Temperature increases with height, suppresses lift'},
+        {name: 'Strong Inversion', max: Infinity, color: '#808080', details: 'No lift, capped inversion layer'}
+    ],
 
     weatherUnderground: {
         /**
