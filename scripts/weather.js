@@ -21,8 +21,9 @@ app.weather = {
 
                 // Update last updated time
                 const lastUpdated = new Date(observation.obsTimeUtc);
-                lastUpdatedElement.textContent = `Last updated: ${app.time.timeAgo(lastUpdated)}`;
+                lastUpdatedElement.textContent = `Last updated: ${lastUpdated}`;
                 locationElement.textContent = `Location: ${observation.lat.toFixed(3)}, ${observation.lon.toFixed(3)} at ${observation.uk_hybrid.elev} ft`;
+                const barometricPressureKpa = (observation.uk_hybrid.pressure / 10).toFixed(1);
 
                 // Clear loading indicator
                 weatherDataContainer.innerHTML = '';
@@ -82,13 +83,17 @@ app.weather = {
                     },
                     {
                         title: 'Barometric Pressure',
-                        value: `${(observation.uk_hybrid.pressure / 10).toFixed(1)} kPa`,
-                        icon: 'speed'
+                        value: `${barometricPressureKpa} kPa`,
+                        icon: 'speed',
+                        summary: `${this.barometricPressureSummaries.find(s => barometricPressureKpa <= s.max).description}`
                     },
                     {
                         title: 'UV Index',
                         value: `${observation.uv}`,
                         icon: 'light_mode',
+                        background: this.uvIndexSummaries.find(s => observation.uv <= s.max).color,
+                        backgroundType: 'color',
+                        summary: `${this.uvIndexSummaries.find(s => observation.uv <= s.max).risk}`
                     },
                     {
                         title: 'Solar Radiation',
@@ -115,12 +120,12 @@ app.weather = {
                         
                             <div class="card-body text-center d-flex flex-column justify-content-between"
                                 ${item.background ?
-                                                item.backgroundType === 'image'
-                                                    ? `style="background-image: url('${item.background}'); background-size: cover; background-position: center;"`
-                                                    : item.backgroundType === 'color'
-                                                        ? `style="background-color: ${item.background};"`
-                                                        : ''
-                                                : ''}>
+                        item.backgroundType === 'image'
+                            ? `style="background-image: url('${item.background}'); background-size: cover; background-position: center;"`
+                            : item.backgroundType === 'color'
+                                ? `style="background-color: ${item.background};"`
+                                : ''
+                        : ''}>
                         
                                 <div class="flex-grow-1 d-flex justify-content-center align-items-start">
                                     <span class="material-symbols-outlined weather-icon" style="${item.style ?? ''}">${item.icon}</span>
@@ -233,6 +238,21 @@ app.weather = {
         {name: 'Stable', max: 0.0, color: '#c0cfff', details: 'Cool and calm, no climb potential'},
         {name: 'Inverted', max: 0.5, color: '#d3d3d3', details: 'Temperature increases with height, suppresses lift'},
         {name: 'Strong Inversion', max: Infinity, color: '#808080', details: 'No lift, capped inversion layer'}
+    ],
+
+    uvIndexSummaries: [
+        {risk: 'Low', max: 2.9, color: '#00ff00'},
+        {risk: 'Moderate', max: 5.9, color: '#ffff00'},
+        {risk: 'High', max: 7.9, color: '#ff0000'},
+        {risk: 'Very High', max: 10.9, color: '#800000'},
+        {risk: 'Extreme', max: Infinity, color: '#000000'}
+    ],
+
+    barometricPressureSummaries: [
+        {name: 'Very Low', max: 98, description: 'Storms, maybe even severe weather'},
+        {name: 'Low', max: 100, description: 'Clouds, wind, likely rain'},
+        {name: 'Normal', max: 102, description: 'No big drama'},
+        {name: 'High', max: Infinity, description: 'Clear skies, stable weather'},
     ],
 
     weatherUnderground: {
