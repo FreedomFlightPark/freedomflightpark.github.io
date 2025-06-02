@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +75,7 @@
     async function loadAndDisplayWeatherOverlay() {
         try {
             const location = 'ILUMBY7';
-            const weatherData = await app.weather.weatherUnderground.getWeather(location);
+            const weatherData = await app.weather.weatherUnderground.getWeather(location, 60 * 10);
 
             if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
                 const observation = weatherData.observations[0];
@@ -86,7 +85,7 @@
                 windDirectionElement.textContent = `${app.weather.degreesToDirection(observation.winddir)}`;
 
                 const windIconElement = document.querySelector('#wind-direction .weather-icon');
-                windIconElement.style = `transform: rotate(${observation.winddir+180}deg);`;
+                windIconElement.style = `transform: rotate(${observation.winddir + 180}deg);`;
 
                 // Update wind speed/gust
                 const windSpeedElement = document.querySelector('#wind-speed .weather-value');
