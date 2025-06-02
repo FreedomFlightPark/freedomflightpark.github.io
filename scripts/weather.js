@@ -15,7 +15,6 @@ app.weather = {
             const lzWeather = await app.weather.weatherUnderground.getWeather(groundLocation, 60 * 30); // 30-minute cache
             const lapseRateInfo = this.calculateLapseRate(launchWeather, lzWeather);
 
-
             if (launchWeather && launchWeather.observations && launchWeather.observations.length > 0) {
                 const observation = launchWeather.observations[0];
 
@@ -91,8 +90,6 @@ app.weather = {
                         title: 'UV Index',
                         value: `${observation.uv}`,
                         icon: 'light_mode',
-                        background: this.uvIndexSummaries.find(s => observation.uv <= s.max).color,
-                        backgroundType: 'color',
                         summary: `${this.uvIndexSummaries.find(s => observation.uv <= s.max).risk}`
                     },
                     {
@@ -173,34 +170,7 @@ app.weather = {
     degreesToDirection(degrees) {
         // Ensure degrees is within 0-360 range
         degrees = ((degrees % 360) + 360) % 360;
-        const directions = [
-            {name: "N", min: 348.75, max: 360},
-            {name: "N", min: 0, max: 11.25},
-            {name: "NNE", min: 11.25, max: 33.75},
-            {name: "NE", min: 33.75, max: 56.25},
-            {name: "ENE", min: 56.25, max: 78.75},
-            {name: "E", min: 78.75, max: 101.25},
-            {name: "ESE", min: 101.25, max: 123.75},
-            {name: "SE", min: 123.75, max: 146.25},
-            {name: "SSE", min: 146.25, max: 168.75},
-            {name: "S", min: 168.75, max: 191.25},
-            {name: "SSW", min: 191.25, max: 213.75},
-            {name: "SW", min: 213.75, max: 236.25},
-            {name: "WSW", min: 236.25, max: 258.75},
-            {name: "W", min: 258.75, max: 281.25},
-            {name: "WNW", min: 281.25, max: 303.75},
-            {name: "NW", min: 303.75, max: 326.25},
-            {name: "NNW", min: 326.25, max: 348.75}
-        ];
-
-        // Find the matching direction
-        for (const direction of directions) {
-            if (direction.min <= degrees && degrees < direction.max) {
-                return direction.name;
-            }
-        }
-
-        throw new Error(`Invalid degrees: ${degrees}`);
+        return this.directions.find(dir => dir.min <= degrees && degrees < dir.max).name;
     },
 
     /**
@@ -229,6 +199,26 @@ app.weather = {
         };
     },
 
+    directions: [
+        {name: "N", min: 348.75, max: 360},
+        {name: "N", min: 0, max: 11.25},
+        {name: "NNE", min: 11.25, max: 33.75},
+        {name: "NE", min: 33.75, max: 56.25},
+        {name: "ENE", min: 56.25, max: 78.75},
+        {name: "E", min: 78.75, max: 101.25},
+        {name: "ESE", min: 101.25, max: 123.75},
+        {name: "SE", min: 123.75, max: 146.25},
+        {name: "SSE", min: 146.25, max: 168.75},
+        {name: "S", min: 168.75, max: 191.25},
+        {name: "SSW", min: 191.25, max: 213.75},
+        {name: "SW", min: 213.75, max: 236.25},
+        {name: "WSW", min: 236.25, max: 258.75},
+        {name: "W", min: 258.75, max: 281.25},
+        {name: "WNW", min: 281.25, max: 303.75},
+        {name: "NW", min: 303.75, max: 326.25},
+        {name: "NNW", min: 326.25, max: 348.75}
+    ],
+
     lapseSummaries: [
         {name: 'Unstable', max: -3.0, color: '#ff0000', details: 'Strong thermals, turbulent conditions possible'},
         {name: 'Conditional Instability', max: -2.5, color: '#ff8000', details: 'Thermals likely, some instability'},
@@ -242,11 +232,11 @@ app.weather = {
     ],
 
     uvIndexSummaries: [
-        {risk: 'Low', max: 2.9, color: '#00ff00'},
-        {risk: 'Moderate', max: 5.9, color: '#ffff00'},
-        {risk: 'High', max: 7.9, color: '#ff0000'},
-        {risk: 'Very High', max: 10.9, color: '#800000'},
-        {risk: 'Extreme', max: Infinity, color: '#000000'}
+        {risk: 'Low', max: 2.9},
+        {risk: 'Moderate', max: 5.9},
+        {risk: 'High', max: 7.9},
+        {risk: 'Very High', max: 10.9},
+        {risk: 'Extreme', max: Infinity}
     ],
 
     barometricPressureSummaries: [
