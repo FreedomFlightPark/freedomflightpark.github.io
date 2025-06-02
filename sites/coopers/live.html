@@ -64,12 +64,12 @@
 <script>
     var app = app || {};
     document.addEventListener('DOMContentLoaded', async function () {
-
         // Initial data load
         await loadAndDisplayWeatherOverlay();
-
         // Set up an automatic refresh every 5 minutes
         setInterval(loadAndDisplayWeatherOverlay, 5 * 60 * 1000);
+        // refresh the whole page every 6 hours just in case something got balled up
+        setTimeout(() => location.reload(), 6 * 60 * 60 * 1000);
     });
 
     async function loadAndDisplayWeatherOverlay() {
@@ -80,7 +80,7 @@
             if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
                 const observation = weatherData.observations[0];
 
-                // Update wind direction
+                // Update the wind direction
                 const windDirectionElement = document.querySelector('#wind-direction .weather-value');
                 windDirectionElement.textContent = `${app.weather.degreesToDirection(observation.winddir)}`;
 
