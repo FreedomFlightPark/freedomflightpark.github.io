@@ -22,5 +22,18 @@ app.time = {
         }
 
         return 'just now';
+    },
+
+    format(date) {
+        return date.toLocaleTimeString([], {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZoneName: 'short'
+            }
+        );
     }
 }

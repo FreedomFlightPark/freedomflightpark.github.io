@@ -20,7 +20,7 @@ app.weather = {
 
                 // Update last updated time
                 const lastUpdated = new Date(observation.obsTimeUtc);
-                lastUpdatedElement.textContent = `Last updated: ${lastUpdated}`;
+                lastUpdatedElement.textContent = `Last updated: ${app.time.format(lastUpdated)}`;
                 locationElement.textContent = `Location: ${observation.lat.toFixed(3)}, ${observation.lon.toFixed(3)} at ${observation.uk_hybrid.elev} ft`;
                 const barometricPressureKpa = (observation.uk_hybrid.pressure / 10).toFixed(1);
 
