@@ -285,17 +285,11 @@ app.weather = {
          * @property {Observation[]} observations - Array of weather observations
          */
         async getWeather(location, cacheTimeoutSeconds = 0) {
-            // If cacheTimeoutSeconds is 0 or negative, always fetch fresh data
-            if (cacheTimeoutSeconds <= 0) {
-                return await this._fetchWeatherData(location);
-            }
-
-            // Otherwise, implement caching logic with the specified timeout
             const CACHE_KEY = `weather_cache_${location}`;
-            const now = Date.now();
-            let cachedData = null;
+            const nowUtc = Date.now();
 
             // Try to get cached data from localStorage
+            let cachedData = null;
             try {
                 const cachedItem = localStorage.getItem(CACHE_KEY);
                 if (cachedItem) {
@@ -305,22 +299,22 @@ app.weather = {
                 console.error("Error reading from localStorage:", error);
             }
 
-            // If we have cached data and it's not expired based on the provided timeout, return it
-            if (cachedData && (now - cachedData.timestamp < cacheTimeoutSeconds * 1000)) {
-                console.log(`Using cached weather data for ${location} (timeout: ${cacheTimeoutSeconds}s)`);
-                return cachedData.data;
+            if (cachedData && cacheTimeoutSeconds > 0 && cachedData.data.observations[0].obsTimeUtc) {
+                const obsTime = Date.parse(cachedData.data.observations[0].obsTimeUtc);
+                const ageInSeconds = (nowUtc - obsTime) / 1000;
+
+                if (ageInSeconds < cacheTimeoutSeconds) {
+                    console.log(`Using cached weather data for ${location} (age: ${Math.round(ageInSeconds)}s, timeout: ${cacheTimeoutSeconds}s)`);
+                    return cachedData.data;
+                }
             }
 
-            // Otherwise, fetch fresh data
+            // Fetch new data and cache it
             const data = await this._fetchWeatherData(location);
 
-            // Store the fresh data in localStorage with a timestamp
             if (data) {
                 try {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify({
-                        data: data,
-                        timestamp: now
-                    }));
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({data}));
                 } catch (error) {
                     console.error("Error writing to localStorage:", error);
                 }
@@ -328,6 +322,7 @@ app.weather = {
 
             return data;
         },
+
         /**
          * Private method to fetch weather data from the API
          * @param {string} location - The location identifier
