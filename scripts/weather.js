@@ -5,14 +5,14 @@ app.weather = {
      * @returns {Promise<void>}
      */
     async loadWeatherData() {
-        const primaryLocation = 'ILUMBY7';
-        const lapsLocation = 'ILUMBY2';
+        const launchLocation = 'ILUMBY7';
+        const groundLocation = 'ILUMBY2';
         const weatherDataContainer = document.getElementById('weather-data');
         const lastUpdatedElement = document.getElementById('last-updated');
         const locationElement = document.getElementById('location');
         try {
-            const launchWeather = await app.weather.weatherUnderground.getWeather(primaryLocation);
-            const lzWeather = await app.weather.weatherUnderground.getWeather(lapsLocation);
+            const launchWeather = await app.weather.weatherUnderground.getWeather(launchLocation, 60); // 60-second cache
+            const lzWeather = await app.weather.weatherUnderground.getWeather(groundLocation, 60 * 30); // 30-minute cache
             const lapseRateInfo = this.calculateLapseRate(launchWeather, lzWeather);
 
 
@@ -147,7 +147,7 @@ app.weather = {
                     <div class="col-12 text-center">
                         <div class="alert alert-warning" role="alert">
                             No weather data available, please try again later.</br>
-                            In the mean time, try <a href="https://wunderground.com/dashboard/pws/${primaryLocation}" target="_blank">this link</a>
+                            In the mean time, try <a href="https://wunderground.com/dashboard/pws/${launchLocation}" target="_blank">this link</a>
                         </div>
                     </div>
                 `;
@@ -294,7 +294,57 @@ app.weather = {
          * @typedef {Object} WeatherData
          * @property {Observation[]} observations - Array of weather observations
          */
-        async getWeather(location) {
+        async getWeather(location, cacheTimeoutSeconds = 0) {
+            // If cacheTimeoutSeconds is 0 or negative, always fetch fresh data
+            if (cacheTimeoutSeconds <= 0) {
+                return await this._fetchWeatherData(location);
+            }
+
+            // Otherwise, implement caching logic with the specified timeout
+            const CACHE_KEY = `weather_cache_${location}`;
+            const now = Date.now();
+            let cachedData = null;
+
+            // Try to get cached data from localStorage
+            try {
+                const cachedItem = localStorage.getItem(CACHE_KEY);
+                if (cachedItem) {
+                    cachedData = JSON.parse(cachedItem);
+                }
+            } catch (error) {
+                console.error("Error reading from localStorage:", error);
+            }
+
+            // If we have cached data and it's not expired based on the provided timeout, return it
+            if (cachedData && (now - cachedData.timestamp < cacheTimeoutSeconds * 1000)) {
+                console.log(`Using cached weather data for ${location} (timeout: ${cacheTimeoutSeconds}s)`);
+                return cachedData.data;
+            }
+
+            // Otherwise, fetch fresh data
+            const data = await this._fetchWeatherData(location);
+
+            // Store the fresh data in localStorage with a timestamp
+            if (data) {
+                try {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        data: data,
+                        timestamp: now
+                    }));
+                } catch (error) {
+                    console.error("Error writing to localStorage:", error);
+                }
+            }
+
+            return data;
+        },
+        /**
+         * Private method to fetch weather data from the API
+         * @param {string} location - The location identifier
+         * @return {Promise<Object|null>} The weather data or null
+         * @private
+         */
+        async _fetchWeatherData(location) {
             const apiKey = "6dfb9fed05d24b71bb9fed05d20b715d";
             const apiUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${location}&format=json&units=h&numericPrecision=decimal&apiKey=${apiKey}`;
             try {
@@ -308,5 +358,6 @@ app.weather = {
                 return null;
             }
         }
+        ,
     }
 }
