@@ -283,6 +283,7 @@ app.weather = {
         ],
 
     uvIndexSummaries: [
+        {risk: 'None', max: 0, description: 'No risk—no UV exposure'},
         {risk: 'Low', max: 2.9, description: 'Minimal risk—light SPF, sunglasses'},
         {risk: 'Moderate', max: 5.9, description: 'Moderate risk—SPF 30+, hat'},
         {risk: 'High', max: 7.9, description: 'High risk—SPF 30–50, cover'},
