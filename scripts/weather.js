@@ -98,7 +98,7 @@ app.weather = {
 
         return {
             lapseRate: lapseRate.toFixed(2),
-            elevDiff: elevDiffFeet.toFixed(1),
+            elevDiff: Math.abs(elevDiffFeet).toFixed(1),
             summary: summary
         };
     },
