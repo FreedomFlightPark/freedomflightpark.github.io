@@ -6,13 +6,13 @@ app.weather = {
      * Loads weather data for the specified launch location and optionally for the ground location.
      *
      * @param {string} launchLocation - The location for which to load launch weather data.
-     * @param {string} [groundLocation=null] - The optional location for which to load ground weather data.
+     * @param {?string} [groundLocation=null] - The optional location for which to load ground weather data.
      * @return {Promise<Object>} An object containing weather data including observations, lapse rate information, UV index,
      * barometric pressure, and dew point. Returns null or undefined values for properties if no data is available.
      */
     async loadWeatherData(launchLocation, groundLocation = null) {
 
-        let lapseRateInfo, observation, uvIndex, barometricPressure, dewPoint;
+        let lapseRateInfo, observation, uvIndex, barometricPressure, dewPoint, humidity, heatIndex, windChill;
         const launchWeather = await app.weather.weatherUnderground.getWeather(launchLocation, 60); // 60-second cache
 
         if (groundLocation) {
@@ -35,13 +35,31 @@ app.weather = {
                 description: this.dewPointSummaries.find(s => observation.uk_hybrid.dewpt <= s.max).description,
                 celsius: observation.uk_hybrid.dewpt.toFixed(1)
             };
+
+            humidity = {
+                description: this.humiditySummaries.find(s => observation.humidity <= s.max).description,
+                percent: observation.humidity.toFixed(0)
+            };
+
+            heatIndex = {
+                description: this.heatIndexSummaries.find(s => observation.uk_hybrid.heatIndex <= s.max).description,
+                celsius: observation.uk_hybrid.heatIndex.toFixed(1)
+            }
+
+            windChill = {
+                description: this.windChillSummaries.find(s => observation.uk_hybrid.windChill >= s.min).description,
+                celsius: observation.uk_hybrid.windChill.toFixed(1)
+            }
         }
         return {
             observation,
             lapseRateInfo,
             uvIndex,
             barometricPressure,
-            dewPoint
+            dewPoint,
+            humidity,
+            heatIndex,
+            windChill
         }
     },
 
@@ -108,8 +126,7 @@ app.weather = {
             -exponent
         );
 
-        const result = (pressureHpa * factor) / 10;
-        return result;
+        return (pressureHpa * factor) / 10;
     },
 
 
@@ -280,10 +297,34 @@ app.weather = {
         ],
 
     dewPointSummaries: [
-        {"description": "Dry and comfortable, minimal stickiness", "max": 10},
-        {"description": "Slightly humid yet still pleasant", "max": 16},
-        {"description": "Noticeably muggy, sweat lingers", "max": 18},
-        {"description": "Very uncomfortable, heavy oppressive humidity", "max": 21},
-        {"description": "Oppressively humid, extremely sticky conditions", "max": Infinity}
-    ]
+        {description: "Dry and comfortable, minimal stickiness", max: 10},
+        {description: "Slightly humid yet still pleasant", max: 16},
+        {description: "Noticeably muggy, sweat lingers", max: 18},
+        {description: "Very uncomfortable, heavy oppressive humidity", max: 21},
+        {description: "Oppressively humid, extremely sticky conditions", max: Infinity}
+    ],
+
+    humiditySummaries: [
+        {description: 'Dry air, potential dehydration risk', max: 30},
+        {description: 'Comfortable humidity, pleasant conditions', max: 50},
+        {description: 'Slight humidity, mild stickiness', max: 60},
+        {description: 'Humid air, noticeable discomfort', max: 75},
+        {description: 'Very humid, oppressive moisture', max: Infinity}
+    ],
+
+    heatIndexSummaries: [
+        {description: 'Comfortable, minimal heat stress', max: 27},
+        {description: 'Caution: some discomfort, stay hydrated', max: 32},
+        {description: 'Extreme caution: heat cramps possible', max: 39},
+        {description: 'Danger: heatstroke likely, extreme caution', max: 46},
+        {description: 'Extreme danger: heat stroke imminent', max: Infinity}
+    ],
+
+    windChillSummaries: [
+        {description: "Minimal wind chill risk", "min": 0},
+        {description: "Mild cold—light jacket", "min": -10},
+        {description: "High frostbite risk—dress warm", "min": -28},
+        {description: "Severe frostbite risk—limit exposure", "min": -40},
+        {description: "Extreme risk—avoid outdoor exposure", "min": Number.NEGATIVE_INFINITY}
+    ],
 }

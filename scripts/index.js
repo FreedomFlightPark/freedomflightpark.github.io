@@ -54,13 +54,15 @@ app.index = {
                     },
                     {
                         title: 'Humidity',
-                        value: `${weatherData.observation.humidity}%`,
-                        icon: 'humidity_percentage'
+                        value: `${weatherData.humidity.percent}%`,
+                        icon: 'humidity_percentage',
+                        summary: `${weatherData.humidity.description}`
                     },
                     {
                         title: 'Heat Index',
-                        value: `${weatherData.observation.uk_hybrid.heatIndex}ºC`,
-                        icon: 'wb_sunny'
+                        value: `${weatherData.heatIndex.celsius}ºC`,
+                        icon: 'wb_sunny',
+                        summary: `${weatherData.heatIndex.description}`
                     },
                     {
                         title: 'Dew Point',
@@ -70,8 +72,9 @@ app.index = {
                     },
                     {
                         title: 'Wind Chill',
-                        value: `${weatherData.observation.uk_hybrid.windChill}ºC`,
-                        icon: 'ac_unit'
+                        value: `${weatherData.windChill.celsius}ºC`,
+                        icon: 'ac_unit',
+                        summary: `${weatherData.windChill.description}`
                     },
                     {
                         title: 'Barometric Pressure',
