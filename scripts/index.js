@@ -38,9 +38,9 @@ app.index = {
                         title: `Lapse Rate: (${weatherData.lapseRateInfo.elevDiff}ft)`,
                         value: weatherData.lapseRateInfo.lapseRate ? `${weatherData.lapseRateInfo.lapseRate} °C/1000 ft` : 'N/A',
                         icon: 'elevation',
-                        background: weatherData.lapseRateInfo.summary.color,
+                        background: weatherData.lapseRateInfo.details.color,
                         backgroundType: 'color',
-                        summary: `${weatherData.lapseRateInfo.summary.name}`
+                        summary: `${weatherData.lapseRateInfo.details.name}`
                     },
                     {
                         title: 'Temperature',

@@ -94,12 +94,12 @@ app.weather = {
         const elevDiffThousandFeet = Math.abs(elevDiffFeet / 1000);
         const tempDiff = primaryObs.uk_hybrid.temp - lapsObs.uk_hybrid.temp;
         const lapseRate = elevDiffThousandFeet < 0.001 ? 0 : tempDiff / elevDiffThousandFeet;
-        const summary = this.lapseSummaries.find(s => lapseRate <= s.max);
+        const lapseDetails = this.lapseSummaries.find(s => lapseRate <= s.max);
 
         return {
             lapseRate: lapseRate.toFixed(2),
             elevDiff: Math.abs(elevDiffFeet).toFixed(1),
-            summary: summary
+            details: lapseDetails
         };
     },
 
@@ -271,15 +271,15 @@ app.weather = {
      */
     lapseSummaries:
         [
-            {name: 'Unstable', max: -3.0, color: '#ff0000', details: 'Strong thermals, turbulent conditions possible'},
-            {name: 'Conditional Instability', max: -2.5, color: '#ff8000', details: 'Thermals likely, some instability'},
-            {name: 'Conditional Instability', max: -2.0, color: '#ffb6ff', details: 'Weaker thermals developing'},
-            {name: 'Conditional Instability', max: -1.5, color: '#dcb7ff', details: 'Marginal thermal lift possible'},
-            {name: 'Stable', max: -1.2, color: '#fddbb0', details: 'Mostly smooth air, limited thermal activity'},
-            {name: 'Stable', max: -0.5, color: '#8080ff', details: 'Very little thermal activity, smooth flying'},
-            {name: 'Stable', max: 0.0, color: '#c0cfff', details: 'Cool and calm, no climb potential'},
-            {name: 'Inverted', max: 0.5, color: '#d3d3d3', details: 'Temperature increases with height, suppresses lift'},
-            {name: 'Strong Inversion', max: Infinity, color: '#808080', details: 'No lift, capped inversion layer'}
+            {name: 'Unstable', max: -3.0, color: '#ff0000', description: 'Strong thermals, turbulent conditions possible'},
+            {name: 'Conditional Instability', max: -2.5, color: '#ff8000', description: 'Thermals likely, some instability'},
+            {name: 'Conditional Instability', max: -2.0, color: '#ffb6ff', description: 'Weaker thermals developing'},
+            {name: 'Conditional Instability', max: -1.5, color: '#dcb7ff', description: 'Marginal thermal lift possible'},
+            {name: 'Stable', max: -1.2, color: '#fddbb0', description: 'Mostly smooth air, limited thermal activity'},
+            {name: 'Stable', max: -0.5, color: '#8080ff', description: 'Very little thermal activity, smooth flying'},
+            {name: 'Stable', max: 0.0, color: '#c0cfff', description: 'Cool and calm, no climb potential'},
+            {name: 'Inverted', max: 0.5, color: '#d3d3d3', description: 'Temperature increases with height, suppresses lift'},
+            {name: 'Strong Inversion', max: Infinity, color: '#808080', description: 'No lift, capped inversion layer'}
         ],
 
     uvIndexSummaries: [
