@@ -1,12 +1,18 @@
 var app = app || {};
 app.weather = {
+
+
     /**
-     * Updates the weather data display with the latest information
-     * @returns {Promise<{lapseRateInfo: ({lapseRate: null, elevDiff: null, summary: null}|{lapseRate: string, elevDiff: *, summary: *}), observation}>}
+     * Loads weather data for the specified launch location and optionally for the ground location.
+     *
+     * @param {string} launchLocation - The location for which to load launch weather data.
+     * @param {string} [groundLocation=null] - The optional location for which to load ground weather data.
+     * @return {Promise<Object>} An object containing weather data including observations, lapse rate information, UV index,
+     * barometric pressure, and dew point. Returns null or undefined values for properties if no data is available.
      */
     async loadWeatherData(launchLocation, groundLocation = null) {
 
-        let lapseRateInfo;
+        let lapseRateInfo, observation, uvIndex, barometricPressure, dewPoint;
         const launchWeather = await app.weather.weatherUnderground.getWeather(launchLocation, 60); // 60-second cache
 
         if (groundLocation) {
@@ -14,14 +20,28 @@ app.weather = {
             lapseRateInfo = this.calculateLapseRate(launchWeather, lzWeather);
         }
 
-        let observation;
-
         if (launchWeather && launchWeather.observations && launchWeather.observations.length > 0) {
             observation = launchWeather.observations[0];
+            uvIndex = this.uvIndexSummaries.find(s => observation.uv <= s.max);
+            let seaLevelPressure = this.computeSeaLevelPressure(observation.uk_hybrid.elev, observation.uk_hybrid.pressure);
+
+            barometricPressure = {
+                description: this.barometricPressureSummaries.find(s => seaLevelPressure <= s.max).description,
+                kPa: (observation.uk_hybrid.pressure / 10).toFixed(1),
+                hPa: observation.uk_hybrid.pressure.toFixed(1)
+            };
+
+            dewPoint = {
+                description: this.dewPointSummaries.find(s => observation.uk_hybrid.dewpt <= s.max).description,
+                celsius: observation.uk_hybrid.dewpt.toFixed(1)
+            };
         }
         return {
             observation,
-            lapseRateInfo
+            lapseRateInfo,
+            uvIndex,
+            barometricPressure,
+            dewPoint
         }
     },
 
@@ -43,7 +63,7 @@ app.weather = {
      * @param {Object} lapsData - Weather data from laps location
      * @returns {Object} Object containing lapse rate (°C/km) and elevation difference (m)
      */
-    calculateLapseRate(primaryData, lapsData) {
+    calculateLapseRate: function (primaryData, lapsData) {
         if (!primaryData?.observations?.[0] || !lapsData?.observations?.[0]) {
             return {lapseRate: null, elevDiff: null, summary: null};
         }
@@ -61,68 +81,48 @@ app.weather = {
             elevDiff: elevDiffFeet.toFixed(1),
             summary: summary
         };
-    }
-    ,
+    },
 
-    directions: [
-        {name: "N", min: 348.75, max: 360},
-        {name: "N", min: 0, max: 11.25},
-        {name: "NNE", min: 11.25, max: 33.75},
-        {name: "NE", min: 33.75, max: 56.25},
-        {name: "ENE", min: 56.25, max: 78.75},
-        {name: "E", min: 78.75, max: 101.25},
-        {name: "ESE", min: 101.25, max: 123.75},
-        {name: "SE", min: 123.75, max: 146.25},
-        {name: "SSE", min: 146.25, max: 168.75},
-        {name: "S", min: 168.75, max: 191.25},
-        {name: "SSW", min: 191.25, max: 213.75},
-        {name: "SW", min: 213.75, max: 236.25},
-        {name: "WSW", min: 236.25, max: 258.75},
-        {name: "W", min: 258.75, max: 281.25},
-        {name: "WNW", min: 281.25, max: 303.75},
-        {name: "NW", min: 303.75, max: 326.25},
-        {name: "NNW", min: 326.25, max: 348.75}
-    ],
 
-    lapseSummaries:
-        [
-            {name: 'Unstable', max: -3.0, color: '#ff0000', details: 'Strong thermals, turbulent conditions possible'},
-            {name: 'Conditional Instability', max: -2.5, color: '#ff8000', details: 'Thermals likely, some instability'},
-            {name: 'Conditional Instability', max: -2.0, color: '#ffb6ff', details: 'Weaker thermals developing'},
-            {name: 'Conditional Instability', max: -1.5, color: '#dcb7ff', details: 'Marginal thermal lift possible'},
-            {name: 'Stable', max: -1.2, color: '#fddbb0', details: 'Mostly smooth air, limited thermal activity'},
-            {name: 'Stable', max: -0.5, color: '#8080ff', details: 'Very little thermal activity, smooth flying'},
-            {name: 'Stable', max: 0.0, color: '#c0cfff', details: 'Cool and calm, no climb potential'},
-            {name: 'Inverted', max: 0.5, color: '#d3d3d3', details: 'Temperature increases with height, suppresses lift'},
-            {name: 'Strong Inversion', max: Infinity, color: '#808080', details: 'No lift, capped inversion layer'}
-        ],
+    /**
+     * Compute sea‐level equivalent pressure from station pressure and elevation.
+     *
+     * @param {number} elevationFeet - Elevation in feet above sea level.
+     * @param {number} pressureHpa  - Measured pressure in hPa.
+     * @returns {number} Sea‐level equivalent pressure in kPa.
+     */
+    computeSeaLevelPressure: function (elevationFeet, pressureHpa) {
+        // Convert elevation to meters
+        const elevationM = elevationFeet * 0.3048;
 
-    uvIndexSummaries:
-        [
-            {risk: 'Low', max: 2.9},
-            {risk: 'Moderate', max: 5.9},
-            {risk: 'High', max: 7.9},
-            {risk: 'Very High', max: 10.9},
-            {risk: 'Extreme', max: Infinity}
-        ],
+        // Standard constants
+        const T0 = 288.15;       // Sea‐level standard temperature (K)
+        const L = 0.0065;        // Temperature lapse rate (K/m)
+        const g = 9.80665;       // Gravitational acceleration (m/s²)
+        const R = 287.05;        // Specific gas constant for dry air (J/(kg·K))
+        const exponent = g / (R * L);
 
-    barometricPressureSummaries:
-        [
-            {name: 'Very Low', max: 98, description: 'Storms, maybe even severe weather'},
-            {name: 'Low', max: 100, description: 'Clouds, wind, likely rain'},
-            {name: 'Normal', max: 102, description: 'No big drama'},
-            {name: 'High', max: Infinity, description: 'Clear skies, stable weather'},
-        ],
+        // Barometric formula factor
+        const factor = Math.pow(
+            1 - (L * elevationM) / T0,
+            -exponent
+        );
+
+        const result = (pressureHpa * factor) / 10;
+        return result;
+    },
+
 
     weatherUnderground:
         {
             /**
-             * Fetches the current weather data for a given location using an external weather API.
+             * Retrieves weather data for the specified location, with optional caching support.
              *
-             * @param {string} location - The location identifier (e.g., station ID) for which to retrieve weather data.
-             * @return {Promise<Object|null>} A promise that resolves to the weather data object if the API call is successful,
-             * or null if an error occurs.
+             * @param {string} location - The location identifier for which to fetch the weather data.
+             * @param {number} [cacheTimeoutSeconds=0] - The time in seconds the data should be considered valid in the cache. Defaults to 0, which disables caching.
+             * @return {Promise<Object>} A promise resolving to an object containing the weather data.
              */
+
             /**
              * @typedef {Object} UkHybrid
              * @property {number} elev - Elevation in feet
@@ -214,5 +214,76 @@ app.weather = {
                 }
             }
             ,
-        }
+        },
+
+    /**
+     * Represents a list of compass directions with their respective angular ranges.
+     * Each direction is defined with a name, minimum angle, and maximum angle in degrees.
+     */
+    directions: [
+        {name: "N", min: 348.75, max: 360},
+        {name: "N", min: 0, max: 11.25},
+        {name: "NNE", min: 11.25, max: 33.75},
+        {name: "NE", min: 33.75, max: 56.25},
+        {name: "ENE", min: 56.25, max: 78.75},
+        {name: "E", min: 78.75, max: 101.25},
+        {name: "ESE", min: 101.25, max: 123.75},
+        {name: "SE", min: 123.75, max: 146.25},
+        {name: "SSE", min: 146.25, max: 168.75},
+        {name: "S", min: 168.75, max: 191.25},
+        {name: "SSW", min: 191.25, max: 213.75},
+        {name: "SW", min: 213.75, max: 236.25},
+        {name: "WSW", min: 236.25, max: 258.75},
+        {name: "W", min: 258.75, max: 281.25},
+        {name: "WNW", min: 281.25, max: 303.75},
+        {name: "NW", min: 303.75, max: 326.25},
+        {name: "NNW", min: 326.25, max: 348.75}
+    ],
+
+    /**
+     * Represents an array of lapse rate summaries, describing atmospheric conditions based on temperature change with altitude.
+     * Each element of the array is an object containing details such as the type of atmospheric stability, maximum lapse rate value, color representation, and descriptive details.
+     *
+     * Properties:
+     * - name {string}: The classification of atmospheric stability (e.g., 'Unstable', 'Stable', 'Inverted').
+     * - max {number}: Maximum lapse rate value for the classification. Represents the threshold in °C/1000ft or similar unit.
+     * - color {string}: Hexadecimal color code associated with the stability type for visual representation.
+     * - details {string}: Descriptive text providing additional context about the atmospheric condition.
+     */
+    lapseSummaries:
+        [
+            {name: 'Unstable', max: -3.0, color: '#ff0000', details: 'Strong thermals, turbulent conditions possible'},
+            {name: 'Conditional Instability', max: -2.5, color: '#ff8000', details: 'Thermals likely, some instability'},
+            {name: 'Conditional Instability', max: -2.0, color: '#ffb6ff', details: 'Weaker thermals developing'},
+            {name: 'Conditional Instability', max: -1.5, color: '#dcb7ff', details: 'Marginal thermal lift possible'},
+            {name: 'Stable', max: -1.2, color: '#fddbb0', details: 'Mostly smooth air, limited thermal activity'},
+            {name: 'Stable', max: -0.5, color: '#8080ff', details: 'Very little thermal activity, smooth flying'},
+            {name: 'Stable', max: 0.0, color: '#c0cfff', details: 'Cool and calm, no climb potential'},
+            {name: 'Inverted', max: 0.5, color: '#d3d3d3', details: 'Temperature increases with height, suppresses lift'},
+            {name: 'Strong Inversion', max: Infinity, color: '#808080', details: 'No lift, capped inversion layer'}
+        ],
+
+    uvIndexSummaries: [
+        {risk: 'Low', max: 2.9, description: 'Minimal risk—light SPF, sunglasses'},
+        {risk: 'Moderate', max: 5.9, description: 'Moderate risk—SPF 30+, hat'},
+        {risk: 'High', max: 7.9, description: 'High risk—SPF 30–50, cover'},
+        {risk: 'Very High', max: 10.9, description: 'Very high risk—SPF 50+'},
+        {risk: 'Extreme', max: Infinity, description: 'Extreme risk—stay indoors, cover'}
+    ],
+
+    barometricPressureSummaries:
+        [
+            {name: 'Very Low', max: 98, description: 'Storms, maybe even severe weather'},
+            {name: 'Low', max: 100, description: 'Clouds, wind, likely rain'},
+            {name: 'Normal', max: 102, description: 'No big drama'},
+            {name: 'High', max: Infinity, description: 'Clear skies, stable weather'},
+        ],
+
+    dewPointSummaries: [
+        {"description": "Dry and comfortable, minimal stickiness", "max": 10},
+        {"description": "Slightly humid yet still pleasant", "max": 16},
+        {"description": "Noticeably muggy, sweat lingers", "max": 18},
+        {"description": "Very uncomfortable, heavy oppressive humidity", "max": 21},
+        {"description": "Oppressively humid, extremely sticky conditions", "max": Infinity}
+    ]
 }

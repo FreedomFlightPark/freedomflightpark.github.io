@@ -12,7 +12,6 @@ app.index = {
 
             // Update last updated time
             const lastUpdated = new Date(weatherData.observation.obsTimeUtc);
-            const barometricPressureKpa = (weatherData.observation.uk_hybrid.pressure / 10).toFixed(1);
 
             lastUpdatedElement.textContent = `Last updated: ${app.time.format(lastUpdated)}`;
             locationElement.textContent = `Location: ${weatherData.observation.lat.toFixed(3)}, ${weatherData.observation.lon.toFixed(3)} at ${weatherData.observation.uk_hybrid.elev} ft`;
@@ -65,8 +64,9 @@ app.index = {
                     },
                     {
                         title: 'Dew Point',
-                        value: `${weatherData.observation.uk_hybrid.dewpt}ºC`,
-                        icon: 'opacity'
+                        value: `${weatherData.dewPoint.celsius}ºC`,
+                        icon: 'opacity',
+                        summary: `${weatherData.dewPoint.description}`
                     },
                     {
                         title: 'Wind Chill',
@@ -75,15 +75,15 @@ app.index = {
                     },
                     {
                         title: 'Barometric Pressure',
-                        value: `${barometricPressureKpa} kPa`,
+                        value: `${weatherData.barometricPressure.kPa} kPa`,
                         icon: 'speed',
-                        summary: `${app.weather.barometricPressureSummaries.find(s => barometricPressureKpa <= s.max).description}`
+                        summary: `${weatherData.barometricPressure.description}`
                     },
                     {
                         title: 'UV Index',
                         value: `${weatherData.observation.uv}`,
                         icon: 'light_mode',
-                        summary: `${app.weather.uvIndexSummaries.find(s => weatherData.observation.uv <= s.max).risk}`
+                        summary: `${weatherData.uvIndex.risk}, (${weatherData.uvIndex.description})`
                     },
                     {
                         title: 'Solar Radiation',
