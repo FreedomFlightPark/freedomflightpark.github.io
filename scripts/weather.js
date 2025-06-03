@@ -7,16 +7,18 @@ app.weather = {
      *
      * @param {string} launchLocation - The location for which to load launch weather data.
      * @param {?string} [groundLocation=null] - The optional location for which to load ground weather data.
+     * @param launchCacheTimeoutSeconds - The cache timeout for the launch site
+     * @param groundCacheTimeout - The cache timeout for the ground site (typically used for lapse rate calculations)
      * @return {Promise<Object>} An object containing weather data including observations, lapse rate information, UV index,
      * barometric pressure, and dew point. Returns null or undefined values for properties if no data is available.
      */
-    async loadWeatherData(launchLocation, groundLocation = null) {
+    async loadWeatherData(launchLocation, groundLocation = null, launchCacheTimeoutSeconds = 60, groundCacheTimeout = 60*30) {
 
         let lapseRateInfo, observation, uvIndex, barometricPressure, dewPoint, humidity, heatIndex, windChill;
-        const launchWeather = await app.weather.weatherUnderground.getWeather(launchLocation, 60); // 60-second cache
+        const launchWeather = await app.weather.weatherUnderground.getWeather(launchLocation, launchCacheTimeoutSeconds); // 60-second cache
 
         if (groundLocation) {
-            const lzWeather = await app.weather.weatherUnderground.getWeather(groundLocation, 60 * 30); // 30-minute cache
+            const lzWeather = await app.weather.weatherUnderground.getWeather(groundLocation, groundCacheTimeout); // 30-minute cache
             lapseRateInfo = this.calculateLapseRate(launchWeather, lzWeather);
         }
 

@@ -74,11 +74,12 @@
 
     async function loadAndDisplayWeatherOverlay() {
         try {
-            const location = 'ILUMBY7';
-            const weatherData = await app.weather.weatherUnderground.getWeather(location, 60 * 10);
+            const launchLocation = 'ILUMBY7';
+            const groundLocation = 'ILUMBY2';
+            const weatherData = await app.weather.loadWeatherData(launchLocation, groundLocation, 60 * 10);
 
-            if (weatherData && weatherData.observations && weatherData.observations.length > 0) {
-                const observation = weatherData.observations[0];
+            if (weatherData && weatherData.observation) {
+                const observation = weatherData.observation;
 
                 // Update the wind direction
                 const windDirectionElement = document.querySelector('#wind-direction .weather-value');
