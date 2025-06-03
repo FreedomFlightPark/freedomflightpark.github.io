@@ -300,7 +300,7 @@ app.weather = {
         ],
 
     dewPointSummaries: [
-        {description: "Dry and comfortable, minimal stickiness", max: 10},
+        {description: "Dry and comfortable", max: 10},
         {description: "Slightly humid yet still pleasant", max: 16},
         {description: "Noticeably muggy, sweat lingers", max: 18},
         {description: "Very uncomfortable, heavy oppressive humidity", max: 21},
